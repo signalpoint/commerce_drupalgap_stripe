@@ -1,7 +1,3 @@
-
-
-
-
 /**
  *
  */
@@ -55,26 +51,26 @@ function commerce_drupalgap_stripe_view_callback() {
  *
  */
 function commerce_drupalgap_stripe_form(form, form_state, order) {
-
+  // 4242 4242 4242 4242 - are the test details
   form.elements.card_number = {
     title: 'Card number',
     type: 'textfield',
-    default_value: '4242 4242 4242 4242',
+    default_value: '',
   };
   form.elements.card_cvc = {
     title: 'CVC',
     type: 'textfield',
-    default_value: '111',
+    default_value: '',
   };
   form.elements.exp_month = {
     title: 'Expiry Month',
     type: 'textfield',
-    default_value: '01',
+    default_value: '',
   };
   form.elements.exp_year = {
     title: 'Expiry Year',
     type: 'textfield',
-    default_value: '2015',
+    default_value: '',
   };
   // Add to cart submit button.
   form.elements.submit = {
@@ -107,7 +103,6 @@ function commerce_drupalgap_stripe_response(status, response) {
   } else {
     $(".payment-errors").text('');
     $.each(_commerce_order, function(order_id, order) {
-      console.log(order_id);
       commerce_drupalgap_stripe_create({
         data: {
           order_id: order_id,
@@ -116,7 +111,7 @@ function commerce_drupalgap_stripe_response(status, response) {
           //stripe_repsonse: JSON.stringify(response),
         },
         success: function(data) {
-          console.log(data);
+          
         }
       });
       // only process one order
@@ -133,7 +128,6 @@ function commerce_drupalgap_stripe_response(status, response) {
  */
 function commerce_drupalgap_stripe_create(options) {
   try {
-    dpm(options);
     options.method = 'POST';
     options.contentType = 'application/x-www-form-urlencoded';
     options.path = 'commerce-payment-stripe.json';
