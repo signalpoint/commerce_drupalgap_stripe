@@ -1,13 +1,15 @@
+
 /**
  *
  */
 function commerce_drupalgap_stripe_menu() {
   try {
     var items = {};
-    items['checkout/payment'] = {
+    items['checkout/payment/%'] = {
       'title': 'Payment',
       'page_callback': 'commerce_drupalgap_stripe_view',
-      'pageshow': 'commerce_drupalgap_stripe_view_callback'
+      'pageshow': 'commerce_drupalgap_stripe_view_callback',
+      'page_arguments': [1],
     };
     return items;
   }
@@ -84,6 +86,7 @@ function commerce_drupalgap_stripe_form(form, form_state, order) {
  * Define the form's submit function.
  */
 function commerce_drupalgap_stripe_form_submit(form, form_state) {
+  drupalgap_goto('checkout/complete/' + arg(2), {reloadPage: true});
 //Set the stripe publishing key
   Stripe.setPublishableKey('pk_test_lFgh7dNHgyekzHj17LpmmDkb');
   $('#edit-commerce-drupalgap-stripe-form-submit').attr("disabled", "disabled");
@@ -111,7 +114,10 @@ function commerce_drupalgap_stripe_response(status, response) {
           //stripe_repsonse: JSON.stringify(response),
         },
         success: function(data) {
-          
+          drupalgap_goto('checkout/complete/' + arg(2), {reloadPage: true});
+        },
+        error: function(error) {
+          alert('error');
         }
       });
       // only process one order
