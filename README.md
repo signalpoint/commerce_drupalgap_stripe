@@ -40,8 +40,10 @@ Setup
 6. Add these script inclusions to your DrupalGap's index.html file, below the
    jQueryMobile includes and above the drupalgap.js include:
 
+```
      <script type="text/javascript" src="jquery.payment.js"></script>  
      <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+```
 
 7. Modify settings.js to include the commerce_drupalgap_stripe module:
 
