@@ -117,6 +117,7 @@ function commerce_drupalgap_stripe_response(status, response) {
             //stripe_repsonse: JSON.stringify(response),
           },
           success: function(data) {
+            drupalgap_remove_pages_from_dom();
             drupalgap_goto('checkout/complete/' + arg(2), {reloadPage: true});
           },
           error: function(error) {
