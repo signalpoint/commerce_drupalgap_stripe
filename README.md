@@ -48,7 +48,7 @@ Setup
      /* Contrib Modules */
      Drupal.modules.contrib['commerce_drupalgap_stripe'] = {};
 
-8. Add your Stipe API key to the settings.js file, for example:
+8. Add your publishable Stipe API key to the settings.js file, for example:
 
      // Stripe API Key
      drupalgap.settings.stripe_api_key = 'abcdefghijklmnopqrstuvwxyz1234567890';
