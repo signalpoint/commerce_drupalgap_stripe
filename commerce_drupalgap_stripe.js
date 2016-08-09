@@ -94,7 +94,7 @@ function commerce_drupalgap_stripe_form_submit(form, form_state) {
       number: form_state.values.card_number,
       cvc: form_state.values.card_cvc,
       exp_month: form_state.values.exp_month,
-      exp_year: form_state.values.exp_year,
+      exp_year: form_state.values.exp_year
     }, commerce_drupalgap_stripe_response);
   }
   catch (error) { console.log('commerce_drupalgap_stripe_form_submit - ' + error); }
@@ -121,11 +121,13 @@ function commerce_drupalgap_stripe_response(status, response) {
             drupalgap_goto('checkout/complete/' + arg(2), {reloadPage: true});
           },
           error: function(error) {
-            alert('error');
+            alert(error);
+            console.log(JSON.stringify(error));
+            console.log('WARNING: commerce_drupalgap_stripe_response. Be sure CRUD permissions are set > admin/structure/services/list/drupalgap/resources');
           }
         });
         // only process one order
-        return;
+        return false;
       });
     }
   }
