@@ -3,24 +3,19 @@
  *
  */
 function commerce_drupalgap_stripe_menu() {
-  try {
     var items = {};
     items['checkout/payment/%'] = {
-      'title': 'Payment',
-      'page_callback': 'commerce_drupalgap_stripe_view',
-      'pageshow': 'commerce_drupalgap_stripe_view_pageshow',
-      'page_arguments': [2],
+      title: 'Payment',
+      page_callback: 'commerce_drupalgap_stripe_view',
+      pageshow: 'commerce_drupalgap_stripe_view_pageshow',
+      page_arguments: [2]
     };
     return items;
-  }
-  catch (error) {
-    console.log('commerce_drupalgap_stripe_menu - ' + error);
-  }
 }
 
 function commerce_drupalgap_stripe_view(order_id) {
   var container_id = commerce_drupalgap_stripe_container_id(order_id);
-  return '<span class="payment-errors"></span>' +
+  return '<div class="stripe-payment-errors"></div>' +
     '<div id="' + container_id + '"></div>';
 }
 
@@ -103,11 +98,12 @@ function commerce_drupalgap_stripe_form_submit(form, form_state) {
 
 function commerce_drupalgap_stripe_response(status, response) {
   try {
+    console.log(response);
     if (response.error) {
-      $(".payment-errors").text(response.error.message);
+      $(".stripe-payment-errors").addClass('messages error').text(response.error.message);
       $('#edit-commerce-drupalgap-stripe-form-submit').removeAttr("disabled")
     } else {
-      $(".payment-errors").text('');
+      $(".stripe-payment-errors").text('');
       $.each(_commerce_order, function(order_id, order) {
         commerce_drupalgap_stripe_create({
           data: {
@@ -171,8 +167,5 @@ function commerce_drupalgap_stripe_create(options) {
  *
  */
 function commerce_drupalgap_stripe_container_id(order_id) {
-  try {
     return 'commerce_drupalgap_stripe_form_' + order_id;
-  }
-  catch (error) { console.log('commerce_drupalgap_stripe_container_id - ' + error); }
 }
