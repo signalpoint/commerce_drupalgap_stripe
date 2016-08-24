@@ -3,37 +3,37 @@
  *
  */
 function commerce_drupalgap_stripe_menu() {
-    var items = {};
-    items['checkout/payment/%'] = {
-      title: 'Payment',
-      page_callback: 'commerce_drupalgap_stripe_view',
-      pageshow: 'commerce_drupalgap_stripe_view_pageshow',
-      page_arguments: [2]
-    };
-    return items;
+  var items = {};
+  items['checkout/payment/%'] = {
+    title: 'Payment',
+    page_callback: 'commerce_drupalgap_stripe_view',
+    pageshow: 'commerce_drupalgap_stripe_view_pageshow',
+    page_arguments: [2]
+  };
+  return items;
 }
 
 function commerce_drupalgap_stripe_view(order_id) {
   var container_id = commerce_drupalgap_stripe_container_id(order_id);
   return '<div class="stripe-payment-errors"></div>' +
-    '<div id="' + container_id + '"></div>';
+      '<div id="' + container_id + '"></div>';
 }
 
 function commerce_drupalgap_stripe_view_pageshow(order_id) {
   try {
     commerce_order_load(order_id, {
-        success: function(order) {
-          // Set aside the order so it can be used later without fetching
-          // it again.
-          _commerce_order[order_id] = order;
-          var form_html = drupalgap_get_form('commerce_drupalgap_stripe_form', order);
-          var container_id = commerce_drupalgap_stripe_container_id(order_id);
-          $('#' + container_id).html(form_html).trigger('create');
-          // validate the card number on input XXXX XXXX XXXX XXXX
-          $('input#edit-commerce-drupalgap-stripe-form-card-number').payment('formatCardNumber');
-          // validate the cc number on input XXX
-          $('input#edit-commerce-drupalgap-stripe-form-card-cvc').payment('formatCardCVC');
-        }
+      success: function(order) {
+        // Set aside the order so it can be used later without fetching
+        // it again.
+        _commerce_order[order_id] = order;
+        var form_html = drupalgap_get_form('commerce_drupalgap_stripe_form', order);
+        var container_id = commerce_drupalgap_stripe_container_id(order_id);
+        $('#' + container_id).html(form_html).trigger('create');
+        // validate the card number on input XXXX XXXX XXXX XXXX
+        $('input#edit-commerce-drupalgap-stripe-form-number').payment('formatCardNumber');
+        // validate the cc number on input XXX
+        $('input#edit-commerce-drupalgap-stripe-form-cvc').payment('formatCardCVC');
+      }
     });
   }
   catch (error) {
@@ -46,29 +46,41 @@ function commerce_drupalgap_stripe_view_pageshow(order_id) {
  */
 function commerce_drupalgap_stripe_form(form, form_state, order) {
   // 4242 4242 4242 4242 - are the test details
-  form.elements.card_number = {
+  form.elements.number = {
     title: 'Card number',
     type: 'textfield',
     default_value: '',
-    required: true
+    required: true,
+    attributes: {
+      'data-stripe': 'number'
+    }
   };
-  form.elements.card_cvc = {
+  form.elements.cvc = {
     title: 'CVC',
     type: 'textfield',
     default_value: '',
-    required: true
+    required: true,
+    attributes: {
+      'data-stripe': 'cvc'
+    }
   };
   form.elements.exp_month = {
     title: 'Expiry Month',
     type: 'textfield',
     default_value: '',
-    required: true
+    required: true,
+    attributes: {
+      'data-stripe': 'exp-month'
+    }
   };
   form.elements.exp_year = {
     title: 'Expiry Year',
     type: 'textfield',
     default_value: '',
-    required: true
+    required: true,
+    attributes: {
+      'data-stripe': 'exp-year'
+    }
   };
   // Add to cart submit button.
   form.elements.submit = {
@@ -85,15 +97,10 @@ function commerce_drupalgap_stripe_form_submit(form, form_state) {
   try {
     Stripe.setPublishableKey(drupalgap.settings.stripe_api_key);
     $('#edit-commerce-drupalgap-stripe-form-submit').attr("disabled", "disabled");
-    Stripe.card.createToken({
-      number: form_state.values.card_number,
-      cvc: form_state.values.card_cvc,
-      exp_month: form_state.values.exp_month,
-      exp_year: form_state.values.exp_year
-    }, commerce_drupalgap_stripe_response);
+    Stripe.card.createToken($('#commerce_drupalgap_stripe_form'), commerce_drupalgap_stripe_response);
   }
   catch (error) { console.log('commerce_drupalgap_stripe_form_submit - ' + error); }
-  
+
 }
 
 function commerce_drupalgap_stripe_response(status, response) {
@@ -167,5 +174,5 @@ function commerce_drupalgap_stripe_create(options) {
  *
  */
 function commerce_drupalgap_stripe_container_id(order_id) {
-    return 'commerce_drupalgap_stripe_form_' + order_id;
+  return 'commerce_drupalgap_stripe_form_' + order_id;
 }
