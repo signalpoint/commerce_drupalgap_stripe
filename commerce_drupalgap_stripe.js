@@ -1,3 +1,4 @@
+var _commerce_stripe_order_id = null; // Holds the order id for payment.
 
 /**
  *
@@ -45,6 +46,11 @@ function commerce_drupalgap_stripe_view_pageshow(order_id) {
  *
  */
 function commerce_drupalgap_stripe_form(form, form_state, order) {
+  form.elements.order_id = {
+    type: 'hidden',
+    default_value: order.order_id,
+    required: true
+  };
   // 4242 4242 4242 4242 - are the test details
   form.elements.number = {
     title: 'Card number',
@@ -95,43 +101,48 @@ function commerce_drupalgap_stripe_form(form, form_state, order) {
  */
 function commerce_drupalgap_stripe_form_submit(form, form_state) {
   try {
+    _commerce_stripe_order_id = form_state.values.order_id;
     Stripe.setPublishableKey(drupalgap.settings.stripe_api_key);
     $('#edit-commerce-drupalgap-stripe-form-submit').attr("disabled", "disabled");
     Stripe.card.createToken($('#commerce_drupalgap_stripe_form'), commerce_drupalgap_stripe_response);
   }
   catch (error) { console.log('commerce_drupalgap_stripe_form_submit - ' + error); }
-
 }
 
 function commerce_drupalgap_stripe_response(status, response) {
   try {
-    console.log(response);
+    //console.log(response);
     if (response.error) {
       $(".stripe-payment-errors").addClass('messages error').text(response.error.message);
       $('#edit-commerce-drupalgap-stripe-form-submit').removeAttr("disabled")
     } else {
       $(".stripe-payment-errors").text('');
-      $.each(_commerce_order, function(order_id, order) {
+      var order = _commerce_order[_commerce_stripe_order_id];
+      var order_id = order.order_id;
         commerce_drupalgap_stripe_create({
           data: {
             order_id: order_id,
             stripe_token: response.id,
-            payment_method: 'commerce_stripe',
-            //stripe_repsonse: JSON.stringify(response),
+            payment_method: 'commerce_stripe'
           },
           success: function(data) {
             drupalgap_remove_pages_from_dom();
-            drupalgap_goto('checkout/complete/' + arg(2), {reloadPage: true});
+            commerce_checkout_complete({
+              data: { order_id: order_id },
+              success: function(result) {
+                drupalgap_goto('checkout/complete/' + arg(2), { reloadPage: true });
+              },
+              error: function(xhr, status, message) {
+                if (options.error) { options.error(xhr, status, message); }
+              }
+            });
           },
           error: function(error) {
-            alert(error);
+            drupalgap_alert(error);
             console.log(JSON.stringify(error));
             console.log('WARNING: commerce_drupalgap_stripe_response. Be sure CRUD permissions are set > admin/structure/services/list/drupalgap/resources');
           }
         });
-        // only process one order
-        return false;
-      });
     }
   }
   catch (error) { console.log('commerce_drupalgap_stripe_response - ' + error); }
