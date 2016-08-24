@@ -15,9 +15,9 @@ Setup
    
    Then check the box next to "commerce-payment-stripe" and hit "Save".
 
-3. Download the Stripe PHP library:
+3. Download the Stripe PHP library v1.18.0:
 
-- https://github.com/stripe/stripe-php/archive/master.zip
+- https://github.com/stripe/stripe-php/releases/tag/v1.18.0
    
    Unzip it (and possibly rename the folder) so it lives here in your Drupal site:
    
@@ -33,11 +33,11 @@ Setup
 
 - https://raw.githubusercontent.com/stripe/jquery.payment/master/lib/jquery.payment.js
 
-6. Add these scripts to your DrupalGap's `index.html` file, below the jQueryMobile includes and above the drupalgap.js include:
+6. Add these scripts to your DrupalGap's `index.html` file, below the jQueryMobile includes in the '<head></head>`:
 
 ```
-<script type="text/javascript" charset="utf-8" src="jquery.payment.js"></script>
-<script type="text/javascript" charset="utf-8" src="https://js.stripe.com/v2/"></script>
+<script type="text/javascript" src="jquery.payment.js"></script>
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 ```
 
 7. Modify settings.js to include the `commerce_drupalgap_stripe` module:
